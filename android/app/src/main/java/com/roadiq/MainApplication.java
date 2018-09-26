@@ -24,12 +24,8 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new MapsPackage(),
-            new RNGeocoderPackage(),
-            new RNSensorsPackage()
-      );
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new MapsPackage(), new RNGeocoderPackage(),
+          new RNSensorsPackage(), new SolverPackage());
     }
 
     @Override

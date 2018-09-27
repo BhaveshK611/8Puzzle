@@ -46,10 +46,10 @@ public class SolverModule extends ReactContextBaseJavaModule {
             for (int j = 0; j < N; j++, k++)
                 result[i][j] = Integer.parseInt(temp[k]);
 
-        Solution sol = Puzzle.solve(initial, result);
+        PuzzleSolution sol = Puzzle.solve(initial, result);
 
         if (sol != null)
-            returnFunc.invoke(sol.steps, sol.nodeExplored);
+            returnFunc.invoke(sol.getSteps(), sol.getNodesExplored());
         else
             returnFunc.invoke(null, 0);
     }

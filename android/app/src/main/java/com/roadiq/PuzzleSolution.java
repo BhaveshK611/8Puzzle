@@ -1,19 +1,40 @@
 package com.roadiq;
 
 public class PuzzleSolution {
-    private String steps;
-    private int nodesExplored;
+	private String path;
+	private int nodesExplored;
+	private int errorCode;
 
-    public PuzzleSolution(String steps, int nodesExplored) {
-        this.steps = steps;
-        this.nodesExplored = nodesExplored;
-    }
+	public PuzzleSolution(Node goal, int nodesExplored) {
+		this.errorCode = 0;
+		this.nodesExplored = nodesExplored;
+		StringBuilder path = new StringBuilder("");
 
-    public String getSteps() {
-        return this.steps;
-    }
+		Node temp = goal;
+		while (temp.parent != null) {
+			path.append(temp.move);
+			temp = temp.parent;
+		}
 
-    public int getNodesExplored() {
-        return this.nodesExplored;
-    }
+		this.path = path.reverse().toString();
+	}
+
+	public PuzzleSolution(int errorCode) {
+		this.errorCode = errorCode;
+		this.path = null;
+		this.nodesExplored = 0;
+	}
+
+	public String getPath() {
+		return this.path;
+	}
+
+	public int getNodesExplored() {
+		return this.nodesExplored;
+	}
+
+	public int getErrorCode() {
+		return errorCode;
+	}
+
 }

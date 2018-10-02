@@ -2,13 +2,9 @@ package com.roadiq;
 
 public class Node implements Comparable<Node> {
 	Node parent;
-
 	int mat[][];
-
 	int x, y, level;
-
 	int cost;
-
 	char move;
 
 	public Node(int mat[][], Node parent, int level, int x, int y, char move) {

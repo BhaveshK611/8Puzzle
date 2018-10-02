@@ -21,7 +21,7 @@ public class PuzzleSolution {
 
 	public PuzzleSolution(int errorCode) {
 		this.errorCode = errorCode;
-		this.path = null;
+		this.path = "";
 		this.nodesExplored = 0;
 	}
 

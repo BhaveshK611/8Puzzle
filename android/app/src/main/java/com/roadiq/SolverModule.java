@@ -24,9 +24,9 @@ public class SolverModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void solve(String initialConf, String goalConf, Callback returnFunc) {
+    public void solve(String initialConf, String goalConf, String distType, Callback returnFunc) {
 
-        PuzzleSolution solution = Puzzle.solve(initialConf, goalConf, 'm');
+        PuzzleSolution solution = Puzzle.solve(initialConf, goalConf, distType.charAt(0));
         returnFunc.invoke(solution.getErrorCode(), solution.getPath(), solution.getNodesExplored());
     }
 }

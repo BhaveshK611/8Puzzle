@@ -14,9 +14,6 @@ import java.util.HashMap;
 
 public class SolverModule extends ReactContextBaseJavaModule {
 
-    private static final String DURATION_SHORT_KEY = "SHORT";
-    private static final String DURATION_LONG_KEY = "LONG";
-
     public SolverModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
@@ -27,30 +24,9 @@ public class SolverModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void solve(String initialConf, String resultConf, Callback returnFunc) {
+    public void solve(String initialConf, String goalConf, String distType, Callback returnFunc) {
 
-        String temp[] = null;
-
-        temp = initialConf.split("#");
-
-        int N = (int) Math.sqrt(temp.length);
-        int initial[][] = new int[N][N];
-        int result[][] = new int[N][N];
-
-        for (int i = 0, k = 0; i < N; i++)
-            for (int j = 0; j < N; j++, k++)
-                initial[i][j] = Integer.parseInt(temp[k]);
-
-        temp = resultConf.split("#");
-        for (int i = 0, k = 0; i < N; i++)
-            for (int j = 0; j < N; j++, k++)
-                result[i][j] = Integer.parseInt(temp[k]);
-
-        PuzzleSolution sol = Puzzle.solve(initial, result);
-
-        if (sol != null)
-            returnFunc.invoke(sol.getSteps(), sol.getNodesExplored());
-        else
-            returnFunc.invoke(null, 0);
+        PuzzleSolution solution = Puzzle.solve(initialConf, goalConf, distType.charAt(0));
+        returnFunc.invoke(solution.getErrorCode(), solution.getPath(), solution.getNodesExplored());
     }
 }

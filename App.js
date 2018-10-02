@@ -45,13 +45,14 @@ export default class App extends Component {
         <Button
           onPress={() => {
             this.setState({ gameComp: null });
-            Solver.solve(this.state.initialConf.join('#'), this.state.finalConf.join('#'), (path, exploredCount) => {
-              console.log("Solution: " + path + " " + path.length + " " + exploredCount);
+            Solver.solve(this.state.initialConf.join(','), this.state.finalConf.join(','), 'm', (errorCode, path, exploredCount) => {
+              console.log("[" + errorCode + "]: " + "Solution: path: " + path + " path-length: " + path.length + " " + exploredCount);
               this.setState({
                 gameComp: (<Game solution={{
+                  errorCode: errorCode,
                   path: path,
-                  exploredCount: exploredCount
-                }} initialConf={this.state.initialConf} />),
+                  exploredCount: exploredCount,
+                }} initialConf={this.state.initialConf} />)
               });
             });
           }}

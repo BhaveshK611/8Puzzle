@@ -18,28 +18,78 @@ export default class Game extends Component {
             intervalId: null,
             tilePos: -1,
             step: 0,
-            direction: ''
+            direction: '',
+            errorString: "",
         };
         this.solvePuzzle = this.solvePuzzle.bind(this);
     }
 
     componentDidMount() {
 
-        for (var i = 0; i < 9; i++) {
-            if (this.props.initialConf[i] == 0) {
-                this.setState({ tilePos: i });
-                break;
+        if (this.props.solution.errorCode != 0) {
+            let errorString = "";
+            switch (this.props.solution.errorCode) {
+                case -1:
+                    errorString = "Not possible to reach goal state from given initial state!";
+                    break;
+
+                case -2:
+                    errorString = "Error in Initial State:\n\nPlease fill up all tiles.";
+                    break;
+
+                case -3:
+                    errorString = "Error in Goal State:\n\nPlease fill up all tiles.";
+                    break;
+
+                case -4:
+                    errorString = "Invalid Initial State:\n\nOnly numbers allowed";
+                    break;
+
+                case -5:
+                    errorString = "Invalid Goal State:\n\nOnly numbers allowed";
+                    break;
+
+                case -6:
+                    errorString = "Invalid Initial State:\n\nPlease enter each number only once";
+                    break;
+
+                case -7:
+                    errorString = "Invalid Goal State:\n\nPlease enter each number only once";
+                    break;
+
+                case -8:
+                    errorString = "Invalid Initial State:\n\nOnly numbers between 0-8 allowed";
+                    break;
+
+                case -9:
+                    errorString = "Invalid Goal State:\n\nOnly numbers between 0-8 allowed";
+                    break;
+
+                default:
+                    break;
             }
+            this.setState({
+                errorString: errorString
+            });
         }
+        else {
 
-        this.setState({
-            squares: [...this.props.initialConf],
-            direction: '',
-            step: 0,
-        });
+            for (var i = 0; i < 9; i++) {
+                if (this.props.initialConf[i] == 0) {
+                    this.setState({ tilePos: i });
+                    break;
+                }
+            }
 
-        var intervalId = setInterval(this.solvePuzzle, 500);
-        this.setState({ intervalId: intervalId });
+            this.setState({
+                squares: [...this.props.initialConf],
+                direction: '',
+                step: 0,
+            });
+
+            var intervalId = setInterval(this.solvePuzzle, 500);
+            this.setState({ intervalId: intervalId });
+        }
     }
 
     componentWillUnmount() {
@@ -83,12 +133,18 @@ export default class Game extends Component {
     }
 
     render() {
+
         return (
-            <View style={styles.game} >
-                <GameBoard squares={this.state.squares} direction={this.state.direction} />
-                <View style={styles.gameInfo}>
-                    <Text style={styles.gameInfoText}>No. of Moves: {this.props.solution.path.length}</Text>
-                    <Text style={styles.gameInfoText}>No. of Nodes Explored: {this.props.solution.exploredCount}</Text>
+            <View>
+                <View style={this.props.solution.errorCode == 0 ? styles.game : styles.hideComp} >
+                    <GameBoard squares={this.state.squares} direction={this.state.direction} />
+                    <View style={styles.gameInfo}>
+                        <Text style={styles.gameInfoText}>No. of Moves: {this.props.solution.path.length}</Text>
+                        <Text style={styles.gameInfoText}>No. of Nodes Explored: {this.props.solution.exploredCount}</Text>
+                    </View>
+                </View>
+                <View style={this.props.solution.errorCode == 0 ? styles.hideComp : styles.errorComp}>
+                    <Text style={styles.errorText}>{this.state.errorString}</Text>
                 </View>
             </View>
         );
@@ -108,6 +164,7 @@ class GameBoard extends Component {
     }
 
     render() {
+
         return (
             <View style={styles.gameBoard}>
                 <View style={styles.gameBoardRow}>
@@ -153,6 +210,11 @@ class GameSquare extends Component {
  * Styles
  */
 const styles = StyleSheet.create({
+    hideComp: {
+        opacity: 0,
+        width: 0,
+        height: 0
+    },
     game: {
         margin: 10,
         justifyContent: 'center',
@@ -209,6 +271,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#135940',
         fontFamily: 'Baskerville',
-    }
+    },
+
+    errorComp: {
+        margin: 20,
+        alignItems: 'center',
+    },
+    errorText: {
+        padding: 10,
+        fontSize: 20,
+        color: '#1a4c63',
+        fontFamily: 'Baskerville',
+    },
 
 });

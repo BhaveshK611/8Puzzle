@@ -1,3 +1,5 @@
+package com.roadiq;
+
 public class Node implements Comparable<Node> {
 	Node parent;
 	int state[][];

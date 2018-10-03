@@ -1,3 +1,5 @@
+package com.roadiq;
+
 import java.util.*;
 
 public class Puzzle {
@@ -12,6 +14,8 @@ public class Puzzle {
 		String temp[] = null;
 
 		temp = initialConf.split(",");
+		if (temp.length != 9)
+			return new PuzzleSolution(-2);
 
 		int N = (int) Math.sqrt(temp.length);
 
@@ -28,6 +32,9 @@ public class Puzzle {
 				}
 
 		temp = goalConf.split(",");
+		if (temp.length != 9)
+			return new PuzzleSolution(-3);
+
 		int goal[][] = new int[N][N];
 		for (int i = 0, k = 0; i < N; i++)
 			for (int j = 0; j < N; j++, k++)

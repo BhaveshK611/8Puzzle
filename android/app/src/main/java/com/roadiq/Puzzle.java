@@ -1,5 +1,3 @@
-package com.roadiq;
-
 import java.util.*;
 
 public class Puzzle {
@@ -59,10 +57,10 @@ public class Puzzle {
 			return new PuzzleSolution(-9);
 		}
 
+		int N = initial.length;
+
 		if (!isSolvable(initial, goal))
 			return new PuzzleSolution(-1);
-
-		int N = initial.length;
 
 		PriorityQueue<Node> pq = new PriorityQueue<Node>();
 
@@ -98,6 +96,14 @@ public class Puzzle {
 			root.cost = calculateCostEuclidean(initial, goal);
 			break;
 
+		case 'c':
+			root.cost = calculateCostChebyshev(initial, goal);
+			break;
+
+		case 'l':
+			root.cost = calculateCostLinearConflict(initial, goal);
+			break;
+
 		default:
 			break;
 		}
@@ -117,20 +123,28 @@ public class Puzzle {
 			exploredCount++;
 			for (int i = 0; i < 4; i++) {
 				if (isSafe(min.x + row[i], min.y + col[i], N) && !isExplored(min.move, moves[i])) {
-					Node child = newNode(min.mat, min.x, min.y, min.x + row[i], min.y + col[i], min.level + 1, min,
+					Node child = newNode(min.state, min.x, min.y, min.x + row[i], min.y + col[i], min.level + 1, min,
 							moves[i]);
 
 					switch (distType) {
 					case 'h':
-						child.cost = calculateCostHamming(child.mat, goal);
+						child.cost = calculateCostHamming(child.state, goal);
 						break;
 
 					case 'm':
-						child.cost = calculateCostManhatten(child.mat, goal);
+						child.cost = calculateCostManhatten(child.state, goal);
 						break;
 
 					case 'e':
-						child.cost = calculateCostEuclidean(child.mat, goal);
+						child.cost = calculateCostEuclidean(child.state, goal);
+						break;
+
+					case 'c':
+						child.cost = calculateCostChebyshev(child.state, goal);
+						break;
+
+					case 'l':
+						child.cost = calculateCostLinearConflict(child.state, goal);
 						break;
 
 					default:
@@ -216,6 +230,46 @@ public class Puzzle {
 		return cost;
 	}
 
+	private static int calculateCostChebyshev(int initial[][], int goal[][]) {
+		int cost = 0;
+		int N = initial.length;
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < N; j++)
+				if (initial[i][j] != 0 && initial[i][j] != goal[i][j])
+					cost += max(mod(i - posX[initial[i][j]]), mod(j - posY[initial[i][j]]));
+
+		return cost;
+	}
+
+	private static int calculateCostLinearConflict(int initial[][], int goal[][]) {
+		int conflicts = 0;
+		int N = initial.length;
+
+		int xy[][] = new int[N * (N - 1) / 2][2];
+
+		for (int i = 0, k = 0; i < N; i++)
+			for (int j = i + 1; j < N; j++, k++) {
+				xy[k][0] = i;
+				xy[k][1] = j;
+			}
+
+		for (int k = 0; k < N; k++)
+			for (int i = 0; i < xy.length; i++)
+				if (initial[k][xy[i][0]] != 0 && initial[k][xy[i][1]] != 0)
+					if ((posX[initial[k][xy[i][0]]] == k && posX[initial[k][xy[i][0]]] == posX[initial[k][xy[i][1]]])
+							&& (posY[initial[k][xy[i][0]]] > posY[initial[k][xy[i][1]]]))
+						conflicts++;
+
+		for (int k = 0; k < N; k++)
+			for (int i = 0; i < xy.length; i++)
+				if (initial[xy[i][0]][k] != 0 && initial[xy[i][1]][k] != 0)
+					if ((posY[initial[xy[i][0]][k]] == k && posY[initial[xy[i][0]][k]] == posY[initial[xy[i][1]][k]])
+							&& (posX[initial[xy[i][0]][k]] > posX[initial[xy[i][0]][1]]))
+						conflicts++;
+
+		return calculateCostManhatten(initial, goal) + 2 * conflicts;
+	}
+
 	/*
 	 * Check if Solvable or not
 	 */
@@ -249,12 +303,12 @@ public class Puzzle {
 	 * Utility Functions
 	 */
 
-	private static Node newNode(int mat[][], int x, int y, int newX, int newY, int level, Node parent, char move) {
-		Node node = new Node(mat, parent, level, newX, newY, move);
+	private static Node newNode(int state[][], int x, int y, int newX, int newY, int level, Node parent, char move) {
+		Node node = new Node(state, parent, level, newX, newY, move);
 
-		int temp = node.mat[x][y];
-		node.mat[x][y] = node.mat[newX][newY];
-		node.mat[newX][newY] = temp;
+		int temp = node.state[x][y];
+		node.state[x][y] = node.state[newX][newY];
+		node.state[newX][newY] = temp;
 
 		return node;
 	}
@@ -271,9 +325,26 @@ public class Puzzle {
 		return x < 0 ? -x : x;
 	}
 
+	private static int max(int a, int b) {
+		return a > b ? a : b;
+	}
+
 	/*
-	 * To print all steps:
+	 * Printing Functions:
 	 */
+
+	private static void printSolution(PuzzleSolution solution) {
+		if (solution.getErrorCode() == 0) {
+			System.out.println("\nPath: " + solution.getPath());
+			System.out.print("No of moves: ");
+			System.out.print(solution.getPath().length());
+			System.out.println();
+			System.out.print("No of nodes explored: ");
+			System.out.print(solution.getNodesExplored());
+			System.out.println();
+		} else
+			System.out.println("\nErrorCode: " + solution.getErrorCode() + "\n");
+	}
 
 	private static void printSteps(Node node) {
 		printReverse(node);
@@ -283,14 +354,14 @@ public class Puzzle {
 		if (node == null)
 			return;
 		printReverse(node.parent);
-		printMatrix(node.mat);
+		printState(node.state);
 	}
 
-	private static void printMatrix(int mat[][]) {
-		int N = mat.length;
+	private static void printState(int state[][]) {
+		int N = state.length;
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++)
-				System.out.print(mat[i][j] + " ");
+				System.out.print(state[i][j] + " ");
 			System.out.println();
 		}
 		System.out.println();

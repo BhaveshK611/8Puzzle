@@ -45,7 +45,7 @@ export default class App extends Component {
         <Button
           onPress={() => {
             this.setState({ gameComp: null });
-            Solver.solve(this.state.initialConf.join(','), this.state.finalConf.join(','), 'm', (errorCode, path, exploredCount) => {
+            Solver.solve(this.state.initialConf.join(','), this.state.finalConf.join(','), 'l', (errorCode, path, exploredCount) => {
               console.log("[" + errorCode + "]: " + "Solution: path: " + path + " path-length: " + path.length + " " + exploredCount);
               this.setState({
                 gameComp: (<Game solution={{

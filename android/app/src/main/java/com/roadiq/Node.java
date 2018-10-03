@@ -1,19 +1,17 @@
-package com.roadiq;
-
 public class Node implements Comparable<Node> {
 	Node parent;
-	int mat[][];
+	int state[][];
 	int x, y, level;
 	int cost;
 	char move;
 
 	public Node(int mat[][], Node parent, int level, int x, int y, char move) {
 		int N = mat.length;
-		this.mat = new int[N][N];
+		this.state = new int[N][N];
 
 		for (int i = 0; i < N; i++)
 			for (int j = 0; j < N; j++)
-				this.mat[i][j] = mat[i][j];
+				this.state[i][j] = mat[i][j];
 
 		this.parent = parent;
 		this.level = level;
